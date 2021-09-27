@@ -206,6 +206,8 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argc */
 
     InitLauncher(javaw);
     DumpState();
+
+    // 是否是Trance启动
     if (JLI_IsTraceLauncher()) {
         int i;
         printf("Command line args:\n");
@@ -234,11 +236,13 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argc */
      */
     SelectVersion(argc, argv, &main_class);
 
+    // 校验运行平台与需求平台是否一致、找JRE路径、JVM Type
     CreateExecutionEnvironment(&argc, &argv,
                                jrepath, sizeof(jrepath),
                                jvmpath, sizeof(jvmpath),
                                jvmcfg,  sizeof(jvmcfg));
 
+    // 如果不是Java参数，那就是JVM参数了，此时设置一下JVM的环境变量
     if (!IsJavaArgs()) {
         SetJvmEnvironment(argc,argv);
     }
@@ -250,6 +254,8 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argc */
         start = CounterGet();
     }
 
+    // 从JRE路径中根据JvmType加载指定系统下的库文件(windows的dll,linux下的so),并获取库文件中函数的地址放到ifn变量中.
+    // JNI_CreateJavaVM和JNI_GetDefaultJavaVMInitArgs
     if (!LoadJavaVM(jvmpath, &ifn)) {
         return(6);
     }
@@ -350,9 +356,14 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argc */
         } \
     } while (JNI_FALSE)
 
+
+/*
+ * 新建线程入口,线程栈大小一个G
+ */
 int JNICALL
 JavaMain(void * _args)
 {
+    JLI_TraceLauncher("新线程启动\n");
     JavaMainArgs *args = (JavaMainArgs *)_args;
     int argc = args->argc;
     char **argv = args->argv;
@@ -372,17 +383,26 @@ JavaMain(void * _args)
     RegisterThread();
 
     /* Initialize the virtual machine */
+    // 初始化虚拟机
     start = CounterGet();
+
+    /*
+     * 初始化虚拟机,主要是调用ifn->CreateJavaVM(本地操作系统库文件函数)，
+     * 初始化得到一个JNIEnv结构(主要是一个JNINativeInterface结构)
+     * 并且创建了很多线程
+     */
     if (!InitializeJVM(&vm, &env, &ifn)) {
         JLI_ReportErrorMessage(JVM_ERROR1);
         exit(1);
     }
 
+    // 显示设置 -help
     if (showSettings != NULL) {
         ShowSettings(env, showSettings);
         CHECK_EXCEPTION_LEAVE(1);
     }
 
+    // 打印版本 -version
     if (printVersion || showVersion) {
         PrintJavaVersion(env, showVersion);
         CHECK_EXCEPTION_LEAVE(0);
@@ -441,6 +461,8 @@ JavaMain(void * _args)
      * This method also correctly handles launching existing JavaFX
      * applications that may or may not have a Main-Class manifest entry.
      */
+
+    // 调用Java类去加载main-class
     mainClass = LoadMainClass(env, mode, what);
     CHECK_EXCEPTION_NULL_LEAVE(mainClass);
     /*
@@ -448,6 +470,12 @@ JavaMain(void * _args)
      * JavaFX application with no main method, the mainClass will not be the
      * applications own main class but rather a helper class. To keep things
      * consistent in the UI we need to track and report the application main class.
+     */
+    /*
+     * 在某些情况下，当启动需要帮助程序的应用程序时，例如，
+     * 没有 main 方法的 JavaFX 应用程序，mainClass 将不是
+     * 应用程序拥有主类，而是一个辅助类。 保留东西
+     * 在我们需要跟踪和报告应用程序主类的 UI 中保持一致。
      */
     appClass = GetApplicationClass(env);
     NULL_CHECK_RETURN_VALUE(appClass, -1);
@@ -458,6 +486,14 @@ JavaMain(void * _args)
      * instead of mainClass as that may be a launcher or helper class instead
      * of the application class.
      */
+
+    /*
+     * PostJVMInit 使用类名作为 GUI 用途的应用程序名称，
+     * 例如，在 OSX 上，这将在菜单栏中设置应用程序名称
+     * SWT 和 JavaFX。 所以我们将在这里传递实际的应用程序类
+     * 而不是 mainClass 因为它可能是一个启动器或助手类
+     * 应用程序类。
+     */
     PostJVMInit(env, appClass, vm);
     CHECK_EXCEPTION_LEAVE(1);
     /*
@@ -465,6 +501,12 @@ JavaMain(void * _args)
      * that the main method's signature is correct, therefore further checking
      * is not required. The main method is invoked here so that extraneous java
      * stacks are not in the application stack trace.
+     */
+    /*
+     * LoadMainClass 不仅加载主类，它还将确保
+     * 主要方法的签名是正确的，因此进一步检查
+     * 不需要。 这里调用main方法，使无关的java
+     * 堆栈不在应用程序堆栈跟踪中。
      */
     mainID = (*env)->GetStaticMethodID(env, mainClass, "main",
                                        "([Ljava/lang/String;)V");
@@ -474,7 +516,7 @@ JavaMain(void * _args)
     mainArgs = CreateApplicationArgs(env, argv, argc);
     CHECK_EXCEPTION_NULL_LEAVE(mainArgs);
 
-    /* Invoke main method. */
+    /* 调用main方法 */
     (*env)->CallStaticVoidMethod(env, mainClass, mainID, mainArgs);
 
     /*
@@ -1210,8 +1252,10 @@ ParseArguments(int *pargc, char ***pargv,
 }
 
 /*
- * Initializes the Java Virtual Machine. Also frees options array when
+ * 初始化Java虚拟机,Initializes the Java Virtual Machine. Also frees options array when
  * finished.
+ *
+ * *pvm = 0
  */
 static jboolean
 InitializeJVM(JavaVM **pvm, JNIEnv **penv, InvocationFunctions *ifn)
@@ -1237,6 +1281,8 @@ InitializeJVM(JavaVM **pvm, JNIEnv **penv, InvocationFunctions *ifn)
                    i, args.options[i].optionString);
     }
 
+    // 调用本地操作系统库文件中的函数去创建JavaVM,
+    printf("准备调用操作系统库文件中的函数去创建JavaVM\n  ");
     r = ifn->CreateJavaVM(pvm, (void **)penv, &args);
     JLI_MemFree(options);
     return r == JNI_OK;
@@ -2010,6 +2056,12 @@ ContinueInNewThread(InvocationFunctions* ifn, jlong threadStackSize,
      * Note that HotSpot no longer supports JNI_VERSION_1_1 but it will
      * return its default stack size through the init args structure.
      */
+    /*
+     * 如果用户未指定堆栈大小，请检查 VM 是否有首选项。
+     * 注意 HotSpot 不再支持 JNI_VERSION_1_1 但它会
+     * 通过 init args 结构返回其默认堆栈大小。
+     */
+
     if (threadStackSize == 0) {
       struct JDK1_1InitArgs args1_1;
       memset((void*)&args1_1, 0, sizeof(args1_1));
@@ -2020,6 +2072,7 @@ ContinueInNewThread(InvocationFunctions* ifn, jlong threadStackSize,
       }
     }
 
+    /* 创建一个新线程去创建JVM并且执行main方法 */
     { /* Create a new thread to create JVM and invoke main method */
       JavaMainArgs args;
       int rslt;

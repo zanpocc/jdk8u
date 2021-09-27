@@ -1036,12 +1036,17 @@ ContinueInNewThread0(int (JNICALL *continuation)(void *), jlong stack_size, void
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
+    // 线程栈大小默认一个G
     if (stack_size > 0) {
+      // 设置线程栈大小
       pthread_attr_setstacksize(&attr, stack_size);
     }
 
+    // 启动一个线程,main.c中的JavaMain函数
+    printf("准备启动一个新线程去启动JVM\n");
     if (pthread_create(&tid, &attr, (void *(*)(void*))continuation, (void*)args) == 0) {
       void * tmp;
+      // 等待线程执行完毕
       pthread_join(tid, &tmp);
       rslt = (int)tmp;
     } else {

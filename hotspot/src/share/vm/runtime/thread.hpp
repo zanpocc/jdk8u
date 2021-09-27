@@ -1893,6 +1893,7 @@ inline CompilerThread* CompilerThread::current() {
 
 // The active thread queue. It also keeps track of the current used
 // thread priorities.
+// 活动线程队列。 它还跟踪当前使用的线程优先级。
 class Threads: AllStatic {
   friend class VMStructs;
  private:
@@ -1914,7 +1915,7 @@ class Threads: AllStatic {
   static JavaThread* first()                     { return _thread_list; }
   static void threads_do(ThreadClosure* tc);
 
-  // Initializes the vm and creates the vm thread
+  // 初始化vm并创建vm线程,函数体在哪里？
   static jint create_vm(JavaVMInitArgs* args, bool* canTryAgain);
   static void convert_vm_init_libraries_to_agents();
   static void create_vm_init_libraries();

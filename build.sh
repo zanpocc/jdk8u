@@ -5,4 +5,4 @@ source ./env.bash
 ./configure --with-debug-level=slowdebug --enable-debug-symbols --with-freetype-include=/usr/include/freetype2 --with-freetype-lib=/usr/lib/x86_64-linux-gnu
 make
 rm -rf ./build/linux-x86_64-normal-server-slowdebug/jdk/lib/amd64/server/libjvm.debuginfo
-unzip -f ./build/linux-x86_64-normal-server-slowdebug/jdk/lib/amd64/server/libjvm.diz
+unzip ./build/linux-x86_64-normal-server-slowdebug/jdk/lib/amd64/server/libjvm.diz -d ./build/linux-x86_64-normal-server-slowdebug/jdk/lib/amd64/server

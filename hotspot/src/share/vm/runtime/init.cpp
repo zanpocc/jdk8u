@@ -101,8 +101,7 @@ jint init_globals() {
   VM_Version_init();
   os_init_globals();
   stubRoutines_init1();
-  jint status = universe_init();  // dependent on codeCache_init and
-                                  // stubRoutines_init1 and metaspace_init.
+  jint status = universe_init();  // 位于:universe.cpp,依赖于 codeCache_init 和 stubRoutines_init1 和 metaspace_init。
   if (status != JNI_OK)
     return status;
 

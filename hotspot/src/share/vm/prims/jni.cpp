@@ -5179,6 +5179,7 @@ DT_RETURN_MARK_DECL(CreateJavaVM, jint
 #endif /* USDT2 */
 
 _JNI_IMPORT_OR_EXPORT_ jint JNICALL JNI_CreateJavaVM(JavaVM **vm, void **penv, void *args) {
+  printf("进入操作系统库函数入口,准备创建JavaVM\n");
 #ifndef USDT2
   HS_DTRACE_PROBE3(hotspot_jni, CreateJavaVM__entry, vm, penv, args);
 #else /* USDT2 */
@@ -5235,9 +5236,23 @@ _JNI_IMPORT_OR_EXPORT_ jint JNICALL JNI_CreateJavaVM(JavaVM **vm, void **penv, v
    * sets safe_to_recreate_vm to 1, such that any new call to
    * JNI_CreateJavaVM will immediately fail using the above logic.
    */
+    /**
+     * 初始化期间的某些错误是可恢复的，而不是
+     * 防止以后再次调用此方法
+     *（也许有不同的论据）。 然而，在某个
+     * 在初始化期间指向如果发生错误我们不允许
+     * 再次调用此函数（否则会崩溃）。 在那些
+     * 在某些情况下，'canTryAgain' 标志被设置为 false，这会自动地
+     * 将 safe_to_recreate_vm 设置为 1，这样任何新调用
+     * JNI_CreateJavaVM 使用上述逻辑将立即失败。
+     */
   bool can_try_again = true;
 
+  // 初始化vm和创建vm线程(gc线程、。。。)
   result = Threads::create_vm((JavaVMInitArgs*) args, &can_try_again);
+
+
+  // 结果
   if (result == JNI_OK) {
     JavaThread *thread = JavaThread::current();
     /* thread is thread_in_vm here */

@@ -649,30 +649,31 @@ jint universe_init() {
   TraceTime timer("Genesis", TraceStartupTime);
   JavaClasses::compute_hard_coded_offsets();
 
+  // 初始化堆
   jint status = Universe::initialize_heap();
   if (status != JNI_OK) {
     return status;
   }
 
+  // 全局初始化
   Metaspace::global_initialize();
 
-  // Create memory for metadata.  Must be after initializing heap for
-  // DumpSharedSpaces.
+  // 为元数据创建内存。 必须在初始化堆之后转储共享空间。
   ClassLoaderData::init_null_class_loader_data();
 
-  // We have a heap so create the Method* caches before
-  // Metaspace::initialize_shared_spaces() tries to populate them.
+  // 我们有一个堆，所以在创建 Method* 缓存之前
+  // Metaspace::initialize_shared_spaces() 尝试填充它们。
   Universe::_finalizer_register_cache = new LatestMethodCache();
   Universe::_loader_addClass_cache    = new LatestMethodCache();
   Universe::_pd_implies_cache         = new LatestMethodCache();
   Universe::_throw_illegal_access_error_cache = new LatestMethodCache();
 
   if (UseSharedSpaces) {
-    // Read the data structures supporting the shared spaces (shared
-    // system dictionary, symbol table, etc.).  After that, access to
-    // the file (other than the mapped regions) is no longer needed, and
-    // the file is closed. Closing the file does not affect the
-    // currently mapped regions.
+    // 读取支持共享空间的数据结构（shared
+    // 系统字典、符号表等）。 之后，访问
+    // 不再需要文件（除了映射区域），并且
+    // 文件已关闭。 关闭文件不会影响
+    // 当前映射的区域。
     MetaspaceShared::initialize_shared_spaces();
     StringTable::create_table();
   } else {
@@ -797,7 +798,8 @@ char* Universe::preferred_heap_base(size_t heap_size, size_t alignment, NARROW_O
 }
 
 jint Universe::initialize_heap() {
-
+  printf("开始初始化堆\n");
+  printf("UseParallelGC:%d,UseG1GC:%d,UseSerialGC:%d,UseConcMarkSweepGC:%d\n");
   if (UseParallelGC) {
 #if INCLUDE_ALL_GCS
     Universe::_collectedHeap = new ParallelScavengeHeap();
@@ -893,8 +895,8 @@ jint Universe::initialize_heap() {
          Universe::narrow_oop_shift() == 0, "invalid value");
 #endif
 
-  // We will never reach the CATCH below since Exceptions::_throw will cause
-  // the VM to exit if an exception is thrown during initialization
+  // 我们永远不会到达下面的 CATCH 因为 Exceptions::_throw 会导致
+  // 如果在初始化期间抛出异常，VM 要退出
 
   if (UseTLAB) {
     assert(Universe::heap()->supports_tlab_allocation(),
