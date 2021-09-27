@@ -92,6 +92,10 @@ WinMain(HINSTANCE inst, HINSTANCE previnst, LPSTR cmdline, int cmdshow)
 int
 main(int argc, char **argv)
 {
+    printf("进入main方法\n");
+    printf("参数argv1:%s\n",argv[0]);
+    printf("参数argv2:%s\n",argv[1]);
+
     int margc;
     char** margv;
     const jboolean const_javaw = JNI_FALSE;

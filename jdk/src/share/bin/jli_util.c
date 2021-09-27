@@ -87,7 +87,9 @@ JLI_MemFree(void *ptr)
 /*
  * debug helpers we use
  */
-static jboolean _launcher_debug = JNI_FALSE;
+//static jboolean _launcher_debug = JNI_FALSE;
+// fix:添加调试信息打印
+static jboolean _launcher_debug = JNI_TRUE;
 
 void
 JLI_TraceLauncher(const char* fmt, ...)
