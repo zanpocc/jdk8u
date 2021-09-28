@@ -149,7 +149,7 @@ bool            Universe::_fully_initialized = false;
 
 size_t          Universe::_heap_capacity_at_last_gc;
 size_t          Universe::_heap_used_at_last_gc = 0;
-
+// 使用的垃圾收集器结构
 CollectedHeap*  Universe::_collectedHeap = NULL;
 
 NarrowPtrStruct Universe::_narrow_oop = { NULL, 0, true };
@@ -650,12 +650,12 @@ jint universe_init() {
   JavaClasses::compute_hard_coded_offsets();
 
   // 初始化堆
-  jint status = Universe::initialize_heap();
+  jint status = Universe::initialize_heap(); // 启动2线程
   if (status != JNI_OK) {
     return status;
   }
 
-  // 全局初始化
+  // 元数据区全局初始化
   Metaspace::global_initialize();
 
   // 为元数据创建内存。 必须在初始化堆之后转储共享空间。
@@ -678,7 +678,7 @@ jint universe_init() {
     StringTable::create_table();
   } else {
     SymbolTable::create_table();
-    StringTable::create_table();
+    StringTable::create_table(); // 字符串常量池
     ClassLoader::create_package_info_table();
 
     if (DumpSharedSpaces) {
@@ -800,7 +800,7 @@ char* Universe::preferred_heap_base(size_t heap_size, size_t alignment, NARROW_O
 jint Universe::initialize_heap() {
   printf("开始初始化堆\n");
   printf("UseParallelGC:%d,UseG1GC:%d,UseSerialGC:%d,UseConcMarkSweepGC:%d\n");
-  if (UseParallelGC) {
+  if (UseParallelGC) { // 默认使用的垃圾收集器
 #if INCLUDE_ALL_GCS
     Universe::_collectedHeap = new ParallelScavengeHeap();
 #else  // INCLUDE_ALL_GCS
@@ -841,8 +841,8 @@ jint Universe::initialize_heap() {
   }
 
   ThreadLocalAllocBuffer::set_max_size(Universe::heap()->max_tlab_size());
-
-  jint status = Universe::heap()->initialize();
+  // ParallelScavengeHeap->initialize()
+  jint status = Universe::heap()->initialize(); // 初始化堆,启动两线程
   if (status != JNI_OK) {
     return status;
   }

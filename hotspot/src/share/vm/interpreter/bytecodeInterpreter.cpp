@@ -2175,22 +2175,28 @@ run:
 
           UPDATE_PC_AND_TOS_AND_CONTINUE(3, count);
         }
-
+      // 对于new字节码指令的处理
       CASE(_new): {
         u2 index = Bytes::get_Java_u2(pc+1);
+        // 常量池指针指向方法区中的常量池
         ConstantPool* constants = istate->method()->constants();
+        // 常量池不包含Class
         if (!constants->tag_at(index).is_unresolved_klass()) {
           // Make sure klass is initialized and doesn't have a finalizer
+          // 确保klass是初始化并且没有finalizer方法的
           Klass* entry = constants->slot_at(index).get_klass();
           assert(entry->is_klass(), "Should be resolved klass");
           Klass* k_entry = (Klass*) entry;
           assert(k_entry->oop_is_instance(), "Should be InstanceKlass");
           InstanceKlass* ik = (InstanceKlass*) k_entry;
+          // 确保对象所属类型已经经过初始化阶段
           if ( ik->is_initialized() && ik->can_be_fastpath_allocated() ) {
+            // 取对象长度
             size_t obj_size = ik->size_helper();
             oop result = NULL;
             // If the TLAB isn't pre-zeroed then we'll have to do it
             bool need_zero = !ZeroTLAB;
+            // 是否在TLAB中分配对象
             if (UseTLAB) {
               result = (oop) THREAD->tlab().allocate(obj_size);
             }
@@ -2200,10 +2206,11 @@ run:
 #ifndef CC_INTERP_PROFILE
             if (result == NULL) {
               need_zero = true;
-              // Try allocate in shared eden
+              // 直接在eden中分配对象
             retry:
               HeapWord* compare_to = *Universe::heap()->top_addr();
               HeapWord* new_top = compare_to + obj_size;
+              // CAS确保并发下分配成功
               if (new_top <= *Universe::heap()->end_addr()) {
                 if (Atomic::cmpxchg_ptr(new_top, Universe::heap()->top_addr(), compare_to) != compare_to) {
                   goto retry;
@@ -2214,6 +2221,7 @@ run:
 #endif
             if (result != NULL) {
               // Initialize object (if nonzero size and need) and then the header
+              // 如果需要，为对象初始化零值
               if (need_zero ) {
                 HeapWord* to_zero = (HeapWord*) result + sizeof(oopDesc) / oopSize;
                 obj_size -= sizeof(oopDesc) / oopSize;
@@ -2221,6 +2229,7 @@ run:
                   memset(to_zero, 0, obj_size * HeapWordSize);
                 }
               }
+              // 根据是否启用偏向锁，设置对象头信息
               if (UseBiasedLocking) {
                 result->set_mark(ik->prototype_header());
               } else {
@@ -2231,6 +2240,8 @@ run:
               // Must prevent reordering of stores for object initialization
               // with stores that publish the new object.
               OrderAccess::storestore();
+
+              // 将对象引用入栈，继续执行下一条指令
               SET_STACK_OBJECT(result, 0);
               UPDATE_PC_AND_TOS_AND_CONTINUE(3, 1);
             }

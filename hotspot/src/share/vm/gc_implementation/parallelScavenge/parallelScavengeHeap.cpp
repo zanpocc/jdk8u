@@ -51,7 +51,7 @@ PSAdaptiveSizePolicy* ParallelScavengeHeap::_size_policy = NULL;
 PSGCAdaptivePolicyCounters* ParallelScavengeHeap::_gc_policy_counters = NULL;
 ParallelScavengeHeap* ParallelScavengeHeap::_psh = NULL;
 GCTaskManager* ParallelScavengeHeap::_gc_task_manager = NULL;
-
+// Parallel收集器初始化堆
 jint ParallelScavengeHeap::initialize() {
   CollectedHeap::pre_initialize();
 
@@ -123,7 +123,7 @@ jint ParallelScavengeHeap::initialize() {
     new PSGCAdaptivePolicyCounters("ParScav:MSC", 2, 3, _size_policy);
   _psh = this;
 
-  // Set up the GCTaskManager
+  // 设置 GCTaskManager,启动两个线程
   _gc_task_manager = GCTaskManager::create(ParallelGCThreads);
 
   if (UseParallelOldGC && !PSParallelCompact::initialize()) {

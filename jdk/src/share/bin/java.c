@@ -52,6 +52,7 @@
 
 
 #include "java.h"
+#include <sys/prctl.h>
 
 /*
  * A NOTE TO DEVELOPERS: For performance reasons it is important that
@@ -363,7 +364,8 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argc */
 int JNICALL
 JavaMain(void * _args)
 {
-    JLI_TraceLauncher("新线程启动\n");
+    prctl(PR_SET_NAME,"JavaMain");
+    JLI_TraceLauncher("JavaMain线程启动\n");
     JavaMainArgs *args = (JavaMainArgs *)_args;
     int argc = args->argc;
     char **argv = args->argv;

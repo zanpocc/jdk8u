@@ -31,6 +31,7 @@
  */
 
 #include "defines.h"
+#include <sys/prctl.h>
 
 #ifdef _MSC_VER
 #if _MSC_VER > 1400 && _MSC_VER < 1600
@@ -96,6 +97,10 @@ main(int argc, char **argv)
     printf("参数argv1:%s\n",argv[0]);
     printf("参数argv2:%s\n",argv[1]);
 
+    // 改一下线程名称
+    prctl(PR_SET_NAME,"main线程");
+
+
     int margc;
     char** margv;
     const jboolean const_javaw = JNI_FALSE;
@@ -126,13 +131,20 @@ main(int argc, char **argv)
     margc = argc;
     margv = argv;
 #endif /* WIN32 */
-    return JLI_Launch(margc, margv,
-                   sizeof(const_jargs) / sizeof(char *), const_jargs,
-                   sizeof(const_appclasspath) / sizeof(char *), const_appclasspath,
-                   FULL_VERSION,
-                   DOT_VERSION,
-                   (const_progname != NULL) ? const_progname : *margv,
-                   (const_launcher != NULL) ? const_launcher : *margv,
-                   (const_jargs != NULL) ? JNI_TRUE : JNI_FALSE,
-                   const_cpwildcard, const_javaw, const_ergo_class);
+
+    int result = JLI_Launch(margc, margv,
+                            sizeof(const_jargs) / sizeof(char *), const_jargs,
+                            sizeof(const_appclasspath) / sizeof(char *), const_appclasspath,
+                            FULL_VERSION,
+                            DOT_VERSION,
+                            (const_progname != NULL) ? const_progname : *margv,
+                            (const_launcher != NULL) ? const_launcher : *margv,
+                            (const_jargs != NULL) ? JNI_TRUE : JNI_FALSE,
+                            const_cpwildcard, const_javaw, const_ergo_class);
+
+    // 打印一下当前进程的所有线程
+
+
+
+    return result;
 }

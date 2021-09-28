@@ -3431,11 +3431,11 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
   // change the stack size recorded here to one based on the java thread
   // stacksize. This adjusted size is what is used to figure the placement
   // of the guard pages.
-    // 必须在 set_active_handles 和 initialize_thread_local_storage 之前执行此操作
-    // 注意：在 solaris 上 initialize_thread_local_storage() 将（间接）
-    // 根据java线程将这里记录的栈大小改为1
-    // 堆栈大小。 这个调整后的大小是用来计算位置的
-    // 保护页。
+  // 必须在 set_active_handles 和 initialize_thread_local_storage 之前执行此操作
+  // 注意：在 solaris 上 initialize_thread_local_storage() 将（间接）
+  // 根据java线程将这里记录的栈大小改为1
+  // 堆栈大小。 这个调整后的大小是用来计算位置的
+  // 保护页。
   main_thread->record_stack_base_and_size();
   main_thread->initialize_thread_local_storage();
 
@@ -3451,8 +3451,8 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
 
   // Enable guard page *after* os::create_main_thread(), otherwise it would
   // crash Linux VM, see notes in os_linux.cpp.
-    // 启用保护页 *after* os::create_main_thread()，否则会
-    // 崩溃 Linux VM，请参阅 os_linux.cpp 中的注释。
+  // 启用保护页 *after* os::create_main_thread()，否则会
+  // 崩溃 Linux VM，请参阅 os_linux.cpp 中的注释。
   main_thread->create_stack_guard_pages();
 
   // Initialize Java-Level synchronization subsystem
@@ -3461,7 +3461,7 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
 
   // Initialize global modules
   // init_globals init.cpp
-  // 初始化全局模块,创建3个线程
+  // 初始化全局模块,创建2个线程
   jint status = init_globals();
   if (status != JNI_OK) {
     delete main_thread;
@@ -3560,16 +3560,16 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
     // The VM creates & returns objects of this class. Make sure it's initialized.
     initialize_class(vmSymbols::java_lang_Class(), CHECK_0);
 
-    // The VM preresolves methods to these classes. Make sure that they get initialized，两个线程
+    // VM 将方法预解析为这些类。 确保它们被初始化The VM preresolves methods to these classes. Make sure that they get initialized，两个线程
     initialize_class(vmSymbols::java_lang_reflect_Method(), CHECK_0);
     initialize_class(vmSymbols::java_lang_ref_Finalizer(),  CHECK_0);
     call_initializeSystemClass(CHECK_0);
 
-    // get the Java runtime name after java.lang.System is initialized
+    // 初始化 java.lang.System 后获取 Java 运行时名称.get the Java runtime name after java.lang.System is initialized
     JDK_Version::set_runtime_name(get_java_runtime_name(THREAD));
     JDK_Version::set_runtime_version(get_java_runtime_version(THREAD));
 
-    // an instance of OutOfMemory exception has been allocated earlier
+    // 一个 OutOfMemory 异常的实例已经提前分配了.an instance of OutOfMemory exception has been allocated earlier
     initialize_class(vmSymbols::java_lang_OutOfMemoryError(), CHECK_0);
     initialize_class(vmSymbols::java_lang_NullPointerException(), CHECK_0);
     initialize_class(vmSymbols::java_lang_ClassCastException(), CHECK_0);
@@ -3653,7 +3653,7 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
   // may be attached late and JVMTI must track phases of VM execution
   JvmtiExport::enter_live_phase();
 
-  // Signal Dispatcher needs to be started before VMInit event is posted，第八个线程
+  // 需要在发布 VMInit 事件之前启动 Signal Dispatcher.Signal Dispatcher needs to be started before VMInit event is posted，第八个线程
   os::signal_init();
 
   // Start Attach Listener if +StartAttachListener or it can't be started lazily
@@ -3680,7 +3680,7 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
     Chunk::start_chunk_pool_cleaner_task();
   }
 
-  // initialize compiler(s)，C1、C2编译器线程
+  // initialize compiler(s)，C1、C2即时编译器线程
 #if defined(COMPILER1) || defined(COMPILER2) || defined(SHARK)
   CompileBroker::compilation_init();
 #endif
@@ -3696,7 +3696,7 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
   }
 
 #if INCLUDE_MANAGEMENT
-  Management::initialize(THREAD); // 第11个线程
+  Management::initialize(THREAD); // 第11个线程:ServiceThread
 #endif // INCLUDE_MANAGEMENT
 
   if (HAS_PENDING_EXCEPTION) {
