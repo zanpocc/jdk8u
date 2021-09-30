@@ -304,7 +304,7 @@ void JavaCalls::call(JavaValue* result, methodHandle method, JavaCallArguments* 
   assert(THREAD->is_Java_thread(), "only JavaThreads can make JavaCalls");
   // Need to wrap each and everytime, since there might be native code down the
   // stack that has installed its own exception handlers
-  os::os_exception_wrapper(call_helper, result, &method, args, THREAD);
+  os::os_exception_wrapper(call_helper, result, &method, args, THREAD); // call_helper(result,&method,args,THREAD)
 }
 
 void JavaCalls::call_helper(JavaValue* result, methodHandle* m, JavaCallArguments* args, TRAPS) {

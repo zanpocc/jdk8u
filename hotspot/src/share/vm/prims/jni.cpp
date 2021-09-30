@@ -2507,7 +2507,7 @@ DT_VOID_RETURN_MARK_DECL(CallStaticVoidMethodV
 DT_VOID_RETURN_MARK_DECL(CallStaticVoidMethodA
                          , HOTSPOT_JNI_CALLSTATICVOIDMETHODA_RETURN());
 #endif /* USDT2 */
-
+// CallStaticVoidMethod
 JNI_ENTRY(void, jni_CallStaticVoidMethod(JNIEnv *env, jclass cls, jmethodID methodID, ...))
   JNIWrapper("CallStaticVoidMethod");
 #ifndef USDT2

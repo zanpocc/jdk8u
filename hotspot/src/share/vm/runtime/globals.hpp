@@ -2471,8 +2471,9 @@ class CommandLineFlags {
                                                                             \
   develop(bool, TraceGCTaskQueue, false,                                    \
           "Trace actions of the GC task queues")                            \
-                                                                            \
-  diagnostic(bool, TraceGCTaskThread, false,                                \
+                                                                                                                                            \
+                                                                           \
+  diagnostic(bool, TraceGCTaskThread, true,                                \
           "Trace actions of the GC task threads")                           \
                                                                             \
   product(bool, PrintParallelOldGCPhaseTimes, false,                        \

@@ -3319,7 +3319,8 @@ void Threads::threads_do(ThreadClosure* tc) {
 
 // 创建虚拟机
 jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
-  printf("create_vm开始初始化vm和创建vm线程\n");
+  printf("create_vm"
+         "开始初始化vm和创建vm线程\n");
   extern void JDK_Version_init();
 
   // Preinitialize version info.

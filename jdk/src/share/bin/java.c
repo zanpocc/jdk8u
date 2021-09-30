@@ -170,7 +170,7 @@ static jlong maxHeapSize        = 0;  /* max heap size */
 static jlong initialHeapSize    = 0;  /* inital heap size */
 
 /*
- * Entry point.
+ * 入口点
  */
 int
 JLI_Launch(int argc, char ** argv,              /* main argc, argc */
@@ -519,8 +519,9 @@ JavaMain(void * _args)
     CHECK_EXCEPTION_NULL_LEAVE(mainArgs);
 
     /* 调用main方法 */
-    (*env)->CallStaticVoidMethod(env, mainClass, mainID, mainArgs);
-
+    printf("开始调用main方法\n");
+    (*env)->CallStaticVoidMethod(env, mainClass, mainID, mainArgs); // jni.cpp:jni_CallStaticVoidMethod
+    printf("调用main方法完成\n");
     /*
      * The launcher's exit code (in the absence of calls to
      * System.exit) will be non-zero if main threw an exception.
@@ -690,6 +691,13 @@ CheckJvmType(int *pargc, char ***argv, jboolean speculative) {
  *   leaving the arg list intact.  The first use is for the JVM flag
  *   -XX:NativeMemoryTracking=value.
  */
+/*
+  * static void SetJvmEnvironment(int argc, char **argv);
+  * 在 JVM 加载之前调用。 我们可以设置环境变量
+  * 由 JVM 使用。 此功能是无损的，
+  * 保留 arg 列表不变。 第一个用途是用于 JVM 标志
+  * -XX:NativeMemoryTracking=值。
+  */
 static void
 SetJvmEnvironment(int argc, char **argv) {
 
@@ -698,11 +706,11 @@ SetJvmEnvironment(int argc, char **argv) {
     for (i = 0; i < argc; i++) {
         char *arg = argv[i];
         /*
-         * Since this must be a VM flag we stop processing once we see
-         * an argument the launcher would not have processed beyond (such
-         * as -version or -h), or an argument that indicates the following
-         * arguments are for the application (i.e. the main class name, or
-         * the -jar argument).
+         * 由于这必须是一个 VM 标志，我们一旦看到就停止处理
+         * 启动器不会处理的参数（例如
+         * 作为 -version 或 -h)，或指示以下内容的参数
+         * 参数用于应用程序（即主类名，或
+         * -jar 参数）。
          */
         if (i > 0) {
             char *prev = argv[i - 1];

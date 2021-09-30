@@ -379,7 +379,9 @@ SynchronizedGCTaskQueue::~SynchronizedGCTaskQueue() {
 //
 GCTaskManager::GCTaskManager(uint workers) :
   _workers(workers),
+  // 启用线程
   _active_workers(0),
+  // 闲置线程
   _idle_workers(0),
   _ndc(NULL) {
   initialize();
@@ -393,24 +395,36 @@ GCTaskManager::GCTaskManager(uint workers, NotifyDoneClosure* ndc) :
   initialize();
 }
 
+// GC线程的创建
 void GCTaskManager::initialize() {
+
+  // 是否打印GC任务管理，在globals.hpp中定义
   if (TraceGCTaskManager) {
     tty->print_cr("GCTaskManager::initialize: workers: %u", workers());
   }
+
   assert(workers() != 0, "no workers");
+
+  // 创建一个监视器对象
   _monitor = new Monitor(Mutex::barrier,                // rank
                          "GCTaskManager monitor",       // name
                          Mutex::_allow_vm_block_flag);  // allow_vm_block
-  // The queue for the GCTaskManager must be a CHeapObj.
+
+  // GCTaskManager 的队列必须是 CHeapObj
   GCTaskQueue* unsynchronized_queue = GCTaskQueue::create_on_c_heap();
+  // 创建一个异步的GC任务队列
   _queue = SynchronizedGCTaskQueue::create(unsynchronized_queue, lock());
+
+  // 创建Task
   _noop_task = NoopGCTask::create_on_c_heap();
   _idle_inactive_task = WaitForBarrierGCTask::create_on_c_heap();
+
+
   _resource_flag = NEW_C_HEAP_ARRAY(bool, workers(), mtGC);
   {
-    // Set up worker threads.
-    //     Distribute the workers among the available processors,
-    //     unless we were told not to, or if the os doesn't want to.
+    // 设置工作线程。
+    // 在可用处理器之间分配工作线程，
+    // 除非我们被告知不要这样做，或者操作系统不想这样做。
     uint* processor_assignment = NEW_C_HEAP_ARRAY(uint, workers(), mtGC);
     if (!BindGCTaskThreadsToCPUs ||
         !os::distribute_processes(workers(), processor_assignment)) {
@@ -418,10 +432,14 @@ void GCTaskManager::initialize() {
         processor_assignment[a] = sentinel_worker();
       }
     }
+
     _thread = NEW_C_HEAP_ARRAY(GCTaskThread*, workers(), mtGC);
+    // 创建GC线程
     for (uint t = 0; t < workers(); t += 1) {
       set_thread(t, GCTaskThread::create(this, t, processor_assignment[t]));
     }
+
+    // 打印
     if (TraceGCTaskThread) {
       tty->print("GCTaskManager::initialize: distribution:");
       for (uint t = 0; t < workers(); t += 1) {
@@ -429,6 +447,7 @@ void GCTaskManager::initialize() {
       }
       tty->cr();
     }
+
     FREE_C_HEAP_ARRAY(uint, processor_assignment, mtGC);
   }
   reset_busy_workers();
@@ -509,14 +528,15 @@ void GCTaskManager::task_idle_workers() {
       // count is correct.
       MutexLockerEx ml(monitor(), Mutex::_no_safepoint_check_flag);
       _idle_inactive_task->set_should_wait(true);
-      // active_workers are a number being requested.  idle_workers
-      // are the number currently idle.  If all the workers are being
-      // requested to be active but some are already idle, reduce
-      // the number of active_workers to be consistent with the
-      // number of idle_workers.  The idle_workers are stuck in
-      // idle tasks and will no longer be release (since a new GC
-      // is starting).  Try later to release enough idle_workers
-      // to allow the desired number of active_workers.
+
+      // active_workers 是一个被请求的数字。 空闲工人
+      // 是当前空闲的号码。 如果所有的工人都在
+      // 请求处于活动状态，但有些已经空闲，减少
+      // active_workers 的数量要与
+      // idle_workers 的数量。 idle_workers 陷入困境
+      // 空闲任务将不再被释放（因为新的 GC
+      // 正在启动）。 稍后尝试释放足够的 idle_workers
+      // 允许所需数量的 active_workers。
       more_inactive_workers =
         workers() - active_workers() - idle_workers();
       if (more_inactive_workers < 0) {

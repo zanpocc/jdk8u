@@ -841,6 +841,7 @@ jint Universe::initialize_heap() {
   }
 
   ThreadLocalAllocBuffer::set_max_size(Universe::heap()->max_tlab_size());
+  // Universe::heap()指向使用的垃圾收集器的堆,例如Parallel就是ParallelScavengeHeap
   // ParallelScavengeHeap->initialize()
   jint status = Universe::heap()->initialize(); // 初始化堆,启动两线程
   if (status != JNI_OK) {
@@ -923,7 +924,7 @@ void Universe::print_compressed_oops_mode(outputStream* st) {
   st->cr();
 }
 
-// Reserve the Java heap, which is now the same for all GCs.
+// 保留 Java 堆，现在对于所有 GC 都是相同的。
 ReservedSpace Universe::reserve_heap(size_t heap_size, size_t alignment) {
   assert(alignment <= Arguments::conservative_max_heap_alignment(),
       err_msg("actual alignment " SIZE_FORMAT " must be within maximum heap alignment " SIZE_FORMAT,

@@ -33,6 +33,7 @@
 #include "runtime/handles.inline.hpp"
 #include "runtime/os.hpp"
 #include "runtime/thread.hpp"
+#include <sys/prctl.h>
 
 PRAGMA_FORMAT_MUTE_WARNINGS_FOR_GCC
 
@@ -95,16 +96,21 @@ void GCTaskThread::print_on(outputStream* st) const {
   st->cr();
 }
 
-// GC workers get tasks from the GCTaskManager and execute
-// them in this method.  If there are no tasks to execute,
-// the GC workers wait in the GCTaskManager's get_task()
-// for tasks to be enqueued for execution.
+// GC worker 从 GCTaskManager 中获取任务并执行
+// 他们在这个方法中。 如果没有要执行的任务，
+// GC worker 在 GCTaskManager 的 get_task() 中等待
+// 用于排队执行的任务。
 
 void GCTaskThread::run() {
-  // Set up the thread for stack overflow support
+  prctl(PR_SET_NAME,"GC线程");
+  printf("Parallel收集器GC线程：%x启动\n",processor_id());
+
+  // 为堆栈溢出支持设置线程
   this->record_stack_base_and_size();
   this->initialize_thread_local_storage();
+
   // Bind yourself to your processor.
+  // 绑定到处理器
   if (processor_id() != GCTaskManager::sentinel_worker()) {
     if (TraceGCTaskThread) {
       tty->print_cr("GCTaskThread::run: "
@@ -125,13 +131,16 @@ void GCTaskThread::run() {
   TimeStamp timer;
 
   for (;/* ever */;) {
-    // These are so we can flush the resources allocated in the inner loop.
+    // 这些是我们可以刷新内部循环中分配的资源。
     HandleMark   hm_inner;
     ResourceMark rm_inner;
     for (; /* break */; ) {
       // This will block until there is a task to be gotten.
+      // 这里将会阻塞,直到有任务到来
       GCTask* task = manager()->get_task(which());
+
       // Record if this is an idle task for later use.
+      // 记录这是否是空闲任务以备后用。
       bool is_idle_task = task->is_idle_task();
       // In case the update is costly
       if (PrintGCTaskTimeStamps) {
@@ -143,10 +152,14 @@ void GCTaskThread::run() {
 
       // If this is the barrier task, it can be destroyed
       // by the GC task manager once the do_it() executes.
+      // 如果这是屏障任务，它可以被销毁
+      // 一旦 do_it() 执行，由 GC 任务管理器执行。
       task->do_it(manager(), which());
 
       // Use the saved value of is_idle_task because references
       // using "task" are not reliable for the barrier task.
+      // 使用 is_idle_task 的保存值，因为引用
+      // 使用“task”对于屏障任务是不可靠的。
       if (!is_idle_task) {
         manager()->note_completion(which());
 
@@ -166,6 +179,9 @@ void GCTaskThread::run() {
         // idle tasks complete outside the normal accounting
         // so that a task can complete without waiting for idle tasks.
         // They have to be terminated separately.
+        // 完成正常记账之外的空闲任务
+        // 这样任务就可以完成而无需等待空闲任务。
+        // 它们必须单独终止。
         IdleGCTask::destroy((IdleGCTask*)task);
         set_is_working(true);
       }

@@ -2200,9 +2200,10 @@ run:
             if (UseTLAB) {
               result = (oop) THREAD->tlab().allocate(obj_size);
             }
-            // Disable non-TLAB-based fast-path, because profiling requires that all
-            // allocations go through InterpreterRuntime::_new() if THREAD->tlab().allocate
-            // returns NULL.
+
+            // 禁用非基于 TLAB 的快速路径，因为分析要求所有
+            // 分配通过 InterpreterRuntime::_new() 如果 THREAD->tlab().allocate
+            // 返回 NULL.
 #ifndef CC_INTERP_PROFILE
             if (result == NULL) {
               need_zero = true;
