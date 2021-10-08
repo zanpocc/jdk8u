@@ -841,7 +841,7 @@ jint Universe::initialize_heap() {
   }
 
   ThreadLocalAllocBuffer::set_max_size(Universe::heap()->max_tlab_size());
-  // Universe::heap()指向使用的垃圾收集器的堆,例如Parallel就是ParallelScavengeHeap
+  // Universe::heap()指向使用的垃圾收集器的堆,例如Parallel就是ParallelScavengeHeap，G1的就是G1CollectedHeap
   // ParallelScavengeHeap->initialize()
   jint status = Universe::heap()->initialize(); // 初始化堆,启动两线程
   if (status != JNI_OK) {
