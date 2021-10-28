@@ -37,6 +37,7 @@
 // The InterpreterRuntime is called by the interpreter for everything
 // that cannot/should not be dealt with in assembly and needs C support.
 
+// 供解释器使用,处理汇编层业务
 class InterpreterRuntime: AllStatic {
   friend class BytecodeClosure; // for method and bcp
   friend class PrintingClosure; // for method and bcp

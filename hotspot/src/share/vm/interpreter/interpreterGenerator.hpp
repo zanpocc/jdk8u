@@ -33,7 +33,7 @@
 // This file contains the platform-independent parts
 // of the interpreter generator.
 
-
+// 模板解释器生成器
 class InterpreterGenerator: public CC_INTERP_ONLY(CppInterpreterGenerator)
                                    NOT_CC_INTERP(TemplateInterpreterGenerator) {
 

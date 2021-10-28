@@ -3681,7 +3681,7 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
     Chunk::start_chunk_pool_cleaner_task();
   }
 
-  // initialize compiler(s)，C1、C2即时编译器线程
+  // initialize compiler(s)，启动即时编译器线程
 #if defined(COMPILER1) || defined(COMPILER2) || defined(SHARK)
   CompileBroker::compilation_init();
 #endif

@@ -69,7 +69,7 @@
 
 //------------------------------------------------------------------------------------------------------------------------
 // The C++ interface to the bytecode interpreter(s).
-
+// 解释器生成器抽象类
 class AbstractInterpreter: AllStatic {
   friend class VMStructs;
   friend class Interpreter;

@@ -139,7 +139,7 @@ class CodeletMark: ResourceMark {
 
 // Wrapper classes to produce Interpreter/InterpreterGenerator from either
 // the c++ interpreter or the template interpreter.
-
+// 解释器模块
 class Interpreter: public CC_INTERP_ONLY(CppInterpreter) NOT_CC_INTERP(TemplateInterpreter) {
 
   public:

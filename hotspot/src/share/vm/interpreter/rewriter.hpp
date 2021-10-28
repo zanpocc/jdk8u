@@ -32,6 +32,7 @@
 // The Rewriter adds caches to the constant pool and rewrites bytecode indices
 // pointing into the constant pool for better interpreter performance.
 
+// 字节码重写,将常量池索引调整为指向常量池Cache的索引
 class Rewriter: public StackObj {
  private:
   instanceKlassHandle _klass;

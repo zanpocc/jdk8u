@@ -88,7 +88,7 @@ class Template VALUE_OBJ_CLASS_SPEC {
 
 // The TemplateTable defines all Templates and provides accessor functions
 // to get the template for a given bytecode.
-
+// 模板表模块，供模板解释器使用
 class TemplateTable: AllStatic {
  public:
   enum Operation { add, sub, mul, div, rem, _and, _or, _xor, shl, shr, ushr };

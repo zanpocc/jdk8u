@@ -119,6 +119,7 @@ class CallInfo VALUE_OBJ_CLASS_SPEC {
 // The LinkResolver is used to resolve constant-pool references at run-time.
 // It does all necessary link-time checks & throws exceptions if necessary.
 
+// 链接解析器,运行时解析一些常量池引用,如类，接口，方法等
 class LinkResolver: AllStatic {
   friend class klassVtable;
   friend class klassItable;

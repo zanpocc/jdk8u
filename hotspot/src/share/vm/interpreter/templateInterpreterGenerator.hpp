@@ -30,6 +30,7 @@
 
 #ifndef CC_INTERP
 
+// 模板解释器生成器
 class TemplateInterpreterGenerator: public AbstractInterpreterGenerator {
  protected:
 

@@ -38,6 +38,7 @@
 // more significant bits. The counter is incremented before a method is activated and an
 // action is triggered when when count() > limit().
 
+// 统计编译目标的调用次数,当调用次数达到一定阈值便触发编译
 class InvocationCounter VALUE_OBJ_CLASS_SPEC {
   friend class VMStructs;
   friend class ciReplay;
