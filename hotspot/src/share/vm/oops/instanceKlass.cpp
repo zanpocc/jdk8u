@@ -564,14 +564,14 @@ void InstanceKlass::eager_initialize_impl(instanceKlassHandle this_oop) {
 }
 
 
-// See "The Virtual Machine Specification" section 2.16.5 for a detailed explanation of the class initialization
-// process. The step comments refers to the procedure described in that section.
-// Note: implementation moved to static method to expose the this pointer.
-void InstanceKlass::initialize(TRAPS) {
+// 有关类初始化的详细说明，请参见“虚拟机规范”第 2.16.5 节
+// 过程。 步骤注释是指该部分中描述的过程。
+// 注意：实现转移到静态方法以暴露 this 指针。
+void InstanceKlass::initialize(TRAPS) { // 实例类初始化
   if (this->should_be_initialized()) {
     HandleMark hm(THREAD);
     instanceKlassHandle this_oop(THREAD, this);
-    initialize_impl(this_oop, CHECK);
+    initialize_impl(this_oop, CHECK); // 初始化实现
     // Note: at this point the class may be initialized
     //       OR it may be in the state of being initialized
     //       in case of recursive initialization!
@@ -829,7 +829,7 @@ void InstanceKlass::initialize_super_interfaces(instanceKlassHandle this_k, TRAP
     }
   }
 }
-
+// 实例类初始化实现
 void InstanceKlass::initialize_impl(instanceKlassHandle this_oop, TRAPS) {
   // Make sure klass is linked (verified) before initialization
   // A class could already be verified, since it has been reflected upon.
@@ -921,7 +921,7 @@ void InstanceKlass::initialize_impl(instanceKlassHandle this_oop, TRAPS) {
     }
   }
 
-  // Step 8
+  // Step 8,调用类的静态代码块
   {
     assert(THREAD->is_Java_thread(), "non-JavaThread in initialize_impl");
     JavaThread* jt = (JavaThread*)THREAD;

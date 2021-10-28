@@ -1566,14 +1566,13 @@ JNI_QUICK_ENTRY(jboolean, jni_IsInstanceOf(JNIEnv *env, jobject obj, jclass claz
   return ret;
 JNI_END
 
-
+// 主席
 static jmethodID get_method_id(JNIEnv *env, jclass clazz, const char *name_str,
                                const char *sig, bool is_static, TRAPS) {
-  // %%%% This code should probably just call into a method in the LinkResolver
-  //
-  // The class should have been loaded (we have an instance of the class
-  // passed in) so the method and signature should already be in the symbol
-  // table.  If they're not there, the method doesn't exist.
+    // %%%% 这段代码应该只是调用 LinkResolver 中的一个方法
+    // 该类应该已经加载（我们有一个类的实例传入）所以方法和签名应该已经在符号表中
+    // 如果它们不存在，则该方法不存在。
+
   const char *name_to_probe = (name_str == NULL)
                         ? vmSymbols::object_initializer_name()->as_C_string()
                         : name_str;
@@ -1584,8 +1583,8 @@ static jmethodID get_method_id(JNIEnv *env, jclass clazz, const char *name_str,
     THROW_MSG_0(vmSymbols::java_lang_NoSuchMethodError(), name_str);
   }
 
-  // Throw a NoSuchMethodError exception if we have an instance of a
-  // primitive java.lang.Class
+  // 如果我们有一个实例，则抛出 NoSuchMethodError 异常
+  // 原始 java.lang.Class
   if (java_lang_Class::is_primitive(JNIHandles::resolve_non_null(clazz))) {
     THROW_MSG_0(vmSymbols::java_lang_NoSuchMethodError(), name_str);
   }
@@ -1595,6 +1594,7 @@ static jmethodID get_method_id(JNIEnv *env, jclass clazz, const char *name_str,
 
   // Make sure class is linked and initialized before handing id's out to
   // Method*s.
+  // 处理前确保类已经连接并且初始化,执行静态代码块
   klass()->initialize(CHECK_NULL);
 
   Method* m;
@@ -1648,6 +1648,7 @@ JNI_ENTRY(jmethodID, jni_GetStaticMethodID(JNIEnv *env, jclass clazz,
   HOTSPOT_JNI_GETSTATICMETHODID_ENTRY(
                                       env, (char *) clazz, (char *) name, (char *)sig);
 #endif /* USDT2 */
+  // 执行静态代码块
   jmethodID ret = get_method_id(env, clazz, name, sig, true, thread);
 #ifndef USDT2
   DTRACE_PROBE1(hotspot_jni, GetStaticMethodID__return, ret);

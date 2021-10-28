@@ -290,7 +290,7 @@ Symbol* SymbolTable::lookup(const Symbol* sym, int begin, int end, TRAPS) {
 
   return the_table()->basic_add(index, (u1*)buffer, len, hashValue, true, THREAD);
 }
-
+// 从符号表里面找符号
 Symbol* SymbolTable::lookup_only(const char* name, int len,
                                    unsigned int& hash) {
   hash = hash_symbol(name, len);

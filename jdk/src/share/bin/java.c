@@ -511,7 +511,7 @@ JavaMain(void * _args)
      * 堆栈不在应用程序堆栈跟踪中。
      */
     mainID = (*env)->GetStaticMethodID(env, mainClass, "main",
-                                       "([Ljava/lang/String;)V");
+                                       "([Ljava/lang/String;)V"); // jni.cpp:jni_GetStaticMethodID
     CHECK_EXCEPTION_NULL_LEAVE(mainID);
 
     /* Build platform specific argument array */
