@@ -31,11 +31,16 @@
 // This file contains the platform-independent parts
 // of the template interpreter and the template interpreter generator.
 
+// 该文件包含与平台无关的部分,平台相关部门在templateInterpreter_<arch>文件里面
+// 模板解释器和模板解释器生成器。
+
 #ifndef CC_INTERP
 
 //------------------------------------------------------------------------------------------------------------------------
 // A little wrapper class to group tosca-specific entry points into a unit.
 // (tosca = Top-Of-Stack CAche)
+// 一个小包装类，用于将特定于 tosca 的入口点分组到一个单元中。
+// (tosca = 栈顶缓存)
 
 class EntryPoint VALUE_OBJ_CLASS_SPEC {
  private:
@@ -58,6 +63,7 @@ class EntryPoint VALUE_OBJ_CLASS_SPEC {
 
 //------------------------------------------------------------------------------------------------------------------------
 // A little wrapper class to group tosca-specific dispatch tables into a unit.
+// 一个小包装类，用于将特定于 tosca 的调度表分组到一个单元中。
 
 class DispatchTable VALUE_OBJ_CLASS_SPEC {
  public:
@@ -79,7 +85,7 @@ class DispatchTable VALUE_OBJ_CLASS_SPEC {
   bool operator == (DispatchTable& y);                // for debugging only
 };
 
-// 基于汇编方式实现的解释器
+// 基于汇编方式实现的解释器，字节码例程都是基于事先准备好的汇编模版在初始化阶段生成机器相关的机器码
 class TemplateInterpreter: public AbstractInterpreter {
   friend class VMStructs;
   friend class InterpreterMacroAssembler;

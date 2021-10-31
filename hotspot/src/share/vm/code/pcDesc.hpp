@@ -32,6 +32,7 @@
 
 class nmethod;
 
+// 映射PC到源码范围内的字节码索引
 class PcDesc VALUE_OBJ_CLASS_SPEC {
   friend class VMStructs;
  private:

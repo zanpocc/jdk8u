@@ -32,6 +32,8 @@
 
 // CodeBlob Types
 // Used in the CodeCache to assign CodeBlobs to different CodeHeaps
+// CodeBlob类型
+// 在 CodeCache 中用于将 CodeBlobs 分配给不同的 CodeHeap
 struct CodeBlobType {
   enum {
     All                 = 0,    // All types (No code cache segmentation)
@@ -57,6 +59,7 @@ struct CodeBlobType {
 //   - data space
 class DeoptimizationBlob;
 
+// 描述CodeCache中的缓存项
 class CodeBlob VALUE_OBJ_CLASS_SPEC {
 
   friend class VMStructs;

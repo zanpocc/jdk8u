@@ -52,7 +52,7 @@ class ciBytecodeStream;
 // The base class for different kinds of bytecode abstractions.
 // Provides the primitive operations to manipulate code relative
 // to the bcp.
-// 字节码模块
+// 字节码模块：提供字节码表提供索引服务
 class Bytecode: public StackObj {
  protected:
   const address   _bcp;

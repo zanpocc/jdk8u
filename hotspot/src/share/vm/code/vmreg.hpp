@@ -60,6 +60,7 @@
 class VMRegImpl;
 typedef VMRegImpl* VMReg;
 
+// 管理CPU寄存器名的模块
 class VMRegImpl {
 // friend class OopMap;
 friend class VMStructs;

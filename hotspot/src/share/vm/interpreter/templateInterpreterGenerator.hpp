@@ -27,10 +27,13 @@
 
 // This file contains the platform-independent parts
 // of the template interpreter generator.
+// 该文件包含与平台无关的部分
+// 模板解释器生成器。
 
 #ifndef CC_INTERP
 
-// 模板解释器生成器
+// 模板解释器生成器，模版解释器生成器会在JVM启动时，调用generate_all生成虚拟机内部公用例程和字节码的CodeLets
+// 解释器持有并访问这些CodeLets
 class TemplateInterpreterGenerator: public AbstractInterpreterGenerator {
  protected:
 

@@ -43,6 +43,7 @@
 class OopClosure;
 class DepChange;
 
+// 代码高速缓存，缓存运行时生成的机器码
 class CodeCache : AllStatic {
   friend class VMStructs;
  private:

@@ -112,6 +112,7 @@ class ImplicitExceptionTable;
 class AbstractCompiler;
 class xmlStream;
 
+// 编译成本地代码的Java方法
 class nmethod : public CodeBlob {
   friend class VMStructs;
   friend class NMethodSweeper;
