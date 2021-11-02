@@ -1794,7 +1794,7 @@ void Assembler::vmovdqu(Address dst, XMMRegister src) {
 }
 
 // Uses zero extension on 64bit
-
+// 这里用来生成机器码
 void Assembler::movl(Register dst, int32_t imm32) {
   int encode = prefix_and_encode(dst->encoding());
   emit_int8((unsigned char)(0xB8 | encode));

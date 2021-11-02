@@ -41,6 +41,16 @@
 
 #define __ _masm->
 
+// x86 64位操作系统的平台相关"模版表"代码
+// 每个条目引用代码缓存(CodeCache)去执行每个字节码指令的本地代码
+// 流程：
+// 1、读取一个字节码指令
+// 2、引用模版表，执行表中的地址(代码缓存中的地址)
+// 3、代码缓存中的本地代码执行
+// 4、跳回继续循环
+// 例如：TemplateTable::iconst(int value)
+
+
 // Platform-dependent initialization
 
 void TemplateTable::pd_initialize() {
@@ -300,6 +310,9 @@ void TemplateTable::iconst(int value) {
   if (value == 0) {
     __ xorl(rax, rax);
   } else {
+    // #define __ masm->
+    // 实际调用：masm->movl(rax, value)
+    // Assembler::movl(Register dst, int32_t imm32)
     __ movl(rax, value);
   }
 }

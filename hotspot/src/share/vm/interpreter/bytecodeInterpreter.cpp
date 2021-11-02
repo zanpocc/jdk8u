@@ -22,6 +22,8 @@
  *
  */
 
+// 使用一个无汇编语言，与平台无关的解释器。完全依赖代码解释执行字节码文件
+
 // no precompiled headers
 #include "classfile/vmSymbols.hpp"
 #include "gc_interface/collectedHeap.hpp"
@@ -46,6 +48,8 @@
 #include "runtime/threadCritical.hpp"
 #include "utilities/exceptions.hpp"
 
+// 需要构建JVM时指定-zero参数，才会有改定义
+//# define CC_INTERP
 // no precompiled headers
 #ifdef CC_INTERP
 
@@ -229,6 +233,11 @@
  */
 #undef UPDATE_PC_AND_TOS_AND_CONTINUE
 #ifdef USELABELS
+// pc（程序计数器）增加。
+// 堆栈大小调整。MORE_STACK 的实现见下文。
+// DO_UPDATE_INSTRUCTION_COUNT 用于调试，它不会影响字节码解释器。
+// DEBUGGER_SINGLE_STEP_NOTIFY 用于 JVM 工具接口 (JVMTI) 代理。这个宏的定义取决于编译器标志，因为它是一个单独的特性“jvmti”。如果不包含 jvmti，则为空语句。
+// 跳转到while(1)无限解释器循环的另一个循环
 #define UPDATE_PC_AND_TOS_AND_CONTINUE(opsize, stack) {         \
         pc += opsize; opcode = *pc; MORE_STACK(stack);          \
         DO_UPDATE_INSTRUCTION_COUNT(opcode);                    \
@@ -449,6 +458,8 @@
 void
 BytecodeInterpreter::runWithChecks(interpreterState istate) {
 #else
+
+// 无限循环，解释执行字节码
 void
 BytecodeInterpreter::run(interpreterState istate) {
 #endif

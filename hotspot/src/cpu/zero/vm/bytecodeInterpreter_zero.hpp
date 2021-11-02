@@ -109,6 +109,7 @@
 #define GET_STACK_SLOT(offset)    (*((intptr_t*) &topOfStack[-(offset)]))
 #define STACK_SLOT(offset)    ((address) &topOfStack[-(offset)])
 #define STACK_ADDR(offset)    (*((address *) &topOfStack[-(offset)]))
+// 取出栈顶-偏移处的值，STACK_INT(-1)为栈顶元素值，STACK_INT(-2)为之前元素的值
 #define STACK_INT(offset)     (*((jint*) &topOfStack[-(offset)]))
 #define STACK_FLOAT(offset)   (*((jfloat *) &topOfStack[-(offset)]))
 #define STACK_OBJECT(offset)  (*((oop *) &topOfStack [-(offset)]))
@@ -117,6 +118,7 @@
 
 #define SET_STACK_SLOT(value, offset)   (*(intptr_t*)&topOfStack[-(offset)] = *(intptr_t*)(value))
 #define SET_STACK_ADDR(value, offset)   (*((address *)&topOfStack[-(offset)]) = (value))
+// 将栈顶-偏移处的值设为value
 #define SET_STACK_INT(value, offset)    (*((jint *)&topOfStack[-(offset)]) = (value))
 #define SET_STACK_FLOAT(value, offset)  (*((jfloat *)&topOfStack[-(offset)]) = (value))
 #define SET_STACK_OBJECT(value, offset) (*((oop *)&topOfStack[-(offset)]) = (value))

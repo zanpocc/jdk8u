@@ -237,6 +237,10 @@ SUPPORT_HEADLESS:=@SUPPORT_HEADLESS@
 # The java launcher uses the default.
 # The others can be selected by specifying -client -server -minimal1 -kernel -zero or -zeroshark
 # on the java launcher command line.
+# 这些是我们要构建的 libjvms。
+# java 启动器使用默认值。
+# 其他可以通过指定 -client -server -minimal1 -kernel -zero 或 -zeroshark 来选择
+# 在 java 启动器命令行上。
 JVM_VARIANTS:=@JVM_VARIANTS@
 JVM_VARIANT_SERVER:=@JVM_VARIANT_SERVER@
 JVM_VARIANT_CLIENT:=@JVM_VARIANT_CLIENT@

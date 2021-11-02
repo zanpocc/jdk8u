@@ -54,6 +54,7 @@
 #ifdef CC_INTERP
 
 // JavaStack Implementation
+// 调整堆栈大小，堆栈是编译时已知的，这里在栈上申请内存
 #define MORE_STACK(count)  \
     (topOfStack -= ((count) * Interpreter::stackElementWords))
 
@@ -456,6 +457,7 @@ static void VMmemCopy64(uint32_t to[2], const uint32_t from[2]);
  * and ineg bytecodes, respectively.
  */
 
+// iadd方法
 static jint VMintAdd(jint op1, jint op2);
 static jint VMintSub(jint op1, jint op2);
 static jint VMintMul(jint op1, jint op2);
