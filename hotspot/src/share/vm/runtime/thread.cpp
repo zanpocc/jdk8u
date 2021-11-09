@@ -1577,11 +1577,13 @@ JavaThread::JavaThread(ThreadFunction entry_point, size_t stack_sz) :
   if (TraceThreadEvents) {
     tty->print_cr("creating thread %p", this);
   }
+  // 初始化线程变量信息，如JNIEnv
   initialize();
   _jni_attach_state = _not_attaching_via_jni;
   set_entry_point(entry_point);
   // Create the native thread itself.
   // %note runtime_23
+  // 创建本地线程
   os::ThreadType thr_type = os::java_thread;
   thr_type = entry_point == &compiler_thread_entry ? os::compiler_thread :
                                                      os::java_thread;

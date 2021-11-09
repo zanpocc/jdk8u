@@ -75,6 +75,8 @@ void CallInfo::set_virtual(KlassHandle resolved_klass, KlassHandle selected_klas
   assert(!resolved_method->is_compiled_lambda_form(), "these must be handled via an invokehandle call");
 }
 
+
+
 void CallInfo::set_handle(methodHandle resolved_method, Handle resolved_appendix, Handle resolved_method_type, TRAPS) {
   if (resolved_method.is_null()) {
     THROW_MSG(vmSymbols::java_lang_InternalError(), "resolved method is null");
