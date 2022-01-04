@@ -1,1 +1,1 @@
-./build/linux-x86_64-normal-server-slowdebug/jdk/bin/java Test
+./build/linux-x86_64-normal-server-slowdebug/jdk/bin/java PlainNioServer

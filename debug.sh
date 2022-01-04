@@ -1,4 +1,4 @@
-gdbserver :1234 ./build/linux-x86_64-normal-server-slowdebug/jdk/bin/java Test
+gdbserver :1234 ./build/linux-x86_64-normal-server-slowdebug/jdk/bin/java PlainNioServer
 
 
 

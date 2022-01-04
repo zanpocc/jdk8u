@@ -48,7 +48,7 @@ export  ZIP_DEBUGINFO_FILES=0
 
 
 # 你的bootstrap jdk的地址，得比当前版本低
-export JAVA_HOME=/home/cg/openlogic-openjdk-8u262-b10-linux-64
+export JAVA_HOME=/root/jdk1.8.0_181
 
 #export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 # unset JAVA_HOME

@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.nio.channels.*;
 import java.nio.channels.spi.*;
 
+/**
+ * Linux SelectorProvider
+ */
 public class EPollSelectorProvider
     extends SelectorProviderImpl
 {

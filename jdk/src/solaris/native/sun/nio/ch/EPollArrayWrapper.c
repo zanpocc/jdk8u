@@ -76,6 +76,9 @@ Java_sun_nio_ch_EPollArrayWrapper_init(JNIEnv *env, jclass this)
 {
 }
 
+/**
+ * EPollSelectorProvider通过JNI调用此方法创建EPOLL对象
+ */
 JNIEXPORT jint JNICALL
 Java_sun_nio_ch_EPollArrayWrapper_epollCreate(JNIEnv *env, jobject this)
 {
@@ -83,6 +86,7 @@ Java_sun_nio_ch_EPollArrayWrapper_epollCreate(JNIEnv *env, jobject this)
      * epoll_create expects a size as a hint to the kernel about how to
      * dimension internal structures. We can't predict the size in advance.
      */
+    printf("Java_sun_nio_ch_EPollArrayWrapper_epollCreate\n");
     int epfd = epoll_create(256);
     if (epfd < 0) {
        JNU_ThrowIOExceptionWithLastError(env, "epoll_create failed");
