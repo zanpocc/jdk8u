@@ -1,40 +1,83 @@
-README:
-  This file should be located at the top of the OpenJDK Mercurial root
-  repository. A full OpenJDK repository set (forest) should also include
-  the following 6 nested repositories:
-    "jdk", "hotspot", "langtools", "corba", "jaxws"  and "jaxp".
+## 1、代码导入
 
-  The root repository can be obtained with something like:
-    hg clone http://hg.openjdk.java.net/jdk8/jdk8 openjdk8
-  
-  You can run the get_source.sh script located in the root repository to get
-  the other needed repositories:
-    cd openjdk8 && sh ./get_source.sh
+~~~shell
+git clone https://github.com/zanpocc/jdk8u.git
+~~~
 
-  People unfamiliar with Mercurial should read the first few chapters of
-  the Mercurial book: http://hgbook.red-bean.com/read/
 
-  See http://openjdk.java.net/ for more information about OpenJDK.
 
-Simple Build Instructions:
-  
-  0. Get the necessary system software/packages installed on your system, see
-     http://hg.openjdk.java.net/jdk8/jdk8/raw-file/tip/README-builds.html
+## 2、Clion导入工程
 
-  1. If you don't have a jdk7u7 or newer jdk, download and install it from
-     http://java.sun.com/javase/downloads/index.jsp
-     Add the /bin directory of this installation to your PATH environment
-     variable.
 
-  2. Configure the build:
-       bash ./configure
-  
-  3. Build the OpenJDK:
-       make all
-     The resulting JDK image should be found in build/*/images/j2sdk-image
 
-where make is GNU make 3.81 or newer, /usr/bin/make on Linux usually
-is 3.81 or newer. Note that on Solaris, GNU make is called "gmake".
+## 3、创建Deployment
 
-Complete details are available in the file:
-     http://hg.openjdk.java.net/jdk8/jdk8/raw-file/tip/README-builds.html
+新增远程服务器配置
+
+Connection的Root Path配置为/root
+
+Mappings中的LocalPath配置为本地工程路径，DeploymentPath配置为/jdk8u
+
+
+
+## 4、新建远程调试配置
+
+target配置为：tcp:远程服务器IP:1234
+
+Remote为/root/jdk8u,Local为本地工程路径
+
+
+
+## 5、上传本地工程到远程服务器上
+
+工程上右键deployment->upload
+
+
+
+## 6、给脚本添加执行权限
+
+~~~shell
+chmod +x ./build.sh
+chmod +x ./configure
+chmod +x ./debug.sh
+~~~
+
+
+
+## 7、下载一个bootstrap jdk
+
+~~~shell
+# 下载，这里是从华为云镜像下载的
+wget https://mirrors.huaweicloud.com/java/jdk/8u181-b13/jdk-8u181-linux-x64.tar.gz
+# 解压
+tar -zxvf jdk-8u181-linux-x64.tar.gz
+# 配置env.sh中JAVA_HOME的地址
+vim env.sh
+~~~
+
+
+
+## 8、执行build.sh
+
+执行过程中，如果提示缺什么工具就安装，然后继续执行build.sh
+
+note: freetype没有提示安装命令就安装freetype和devel
+
+
+
+提示缺少c++config.h就安装
+
+> yum install libstdc++-devel
+
+
+
+## 9、调试
+
+~~~shell
+# 安装gdbserver
+yum install gdb-gdbserver
+~~~
+
+
+
+程序就卡住了，这时去本机的Clion执行点击调试就可以断下了。
